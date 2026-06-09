@@ -11,13 +11,20 @@ use Illuminate\Routing\Controllers\HasMiddleware; // <-- WAJIB DI-IMPORT DI LARA
 class UserController extends Controller implements HasMiddleware // <-- WAJIB IMPLEMENTS
 {
     // JURUS SAKTI LARAVEL 11: Pengganti resmi middleware constructor lama
+    // JURUS SAKTI LARAVEL 11: Pengganti resmi middleware constructor lama
     public static function middleware(): array
     {
         return [
             function ($request, $next) {
-                if (auth()->user()->role !== 'admin') {
+                // JALUR LENGKAP: Menggunakan \Illuminate\Support\Facades\Auth
+                /** @var \App\Models\User $user */
+                $user = \Illuminate\Support\Facades\Auth::user();
+
+                // Pengecekan role menggunakan variabel yang sudah dikenali
+                if ($user->role !== 'admin') {
                     return redirect()->route('admin.dashboard')->with('error', 'Anda tidak memiliki hak akses ke halaman Kelola Kasir!');
                 }
+
                 return $next($request);
             }
         ];

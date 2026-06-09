@@ -16,14 +16,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            dark: '#0F172A', /* bg-slate-900 */
-                            blue: '#2563EB', /* bg-blue-600 */
-                            light: '#F8FAFC', /* bg-slate-50 */
-                            amber: '#F59E0B', /* text-amber-500 */
+                            dark: '#0F172A',
+                            /* bg-slate-900 */
+                            blue: '#2563EB',
+                            /* bg-blue-600 */
+                            light: '#F8FAFC',
+                            /* bg-slate-50 */
+                            amber: '#F59E0B',
+                            /* text-amber-500 */
                         }
                     },
                     fontFamily: {
@@ -31,6 +36,15 @@
                     }
                 }
             }
+        }
+    </script>
+    <script>
+        // Cek memori browser: Apakah user sebelumnya pilih Dark Mode?
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
     </script>
 

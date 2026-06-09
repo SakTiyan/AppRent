@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('tgl_bayar');
             $table->integer('total_biaya');
             $table->integer('jumlah_bayar');
-            $table->enum('status_pembayaran', ['DP', 'Lunas'])->default('Lunas');
+            $table->enum('status_pembayaran', ['Pending', 'Belum Lunas', 'Lunas'])->default('Pending');
             $table->timestamps();
         });
     }

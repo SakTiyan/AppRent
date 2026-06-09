@@ -9,12 +9,14 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logo-square.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -26,25 +28,40 @@
                         }
                     },
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        freedoka: ['Freedoka', 'sans-serif']
                     }
                 }
             }
         }
     </script>
+
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
+                '(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 </head>
 
-<body class="bg-brand-light text-brand-dark font-sans antialiased">
+<body
+    class="bg-brand-light dark:bg-slate-900 text-brand-dark dark:text-slate-100 font-sans antialiased selection:bg-brand-blue selection:text-white transition-colors duration-300">
 
     <div class="flex h-screen overflow-hidden">
 
-        <aside class="w-64 bg-brand-dark text-white flex flex-col z-20 shadow-xl transition-all duration-300">
-            <div class="p-5 flex items-center gap-3 border-b border-slate-800">
+        <aside
+            class="w-64 bg-brand-dark dark:bg-slate-950 text-white flex flex-col z-20 shadow-xl transition-all duration-300 border-r border-transparent dark:border-slate-800">
+
+            <div class="h-16 px-5 flex items-center gap-3 border-b border-slate-800/70 dark:border-slate-800">
                 <img src="{{ asset('assets/img/logo-square.png') }}" alt="Logo" class="w-8 h-8 rounded-lg">
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white">AppRent</h1>
-                    <p class="text-xs text-brand-amber font-medium">Panel {{ ucfirst(Auth::user()->role) }}</p>
+                <div class="font-fredoka">
+                    <h1 class="text-lg font-bold tracking-tight text-brand-blue">App<span
+                            class="text-brand-amber">Rent</span></h1>
+                    <p class="text-xs text-brand-light font-medium">Panel {{ ucfirst(Auth::user()->role) }}</p>
                 </div>
             </div>
 
@@ -55,20 +72,22 @@
                 </a>
 
                 @if (Auth::user()->role == 'admin')
-                    <div class="pt-4 pb-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Master Data</div>
-                    
+                    <div class="pt-4 pb-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Master
+                        Data</div>
+
                     <a href="{{ route('admin.users.index') }}"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.users*') ? 'bg-brand-blue text-white font-medium shadow-md shadow-brand-blue/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fa-solid fa-users-gear w-5 text-center"></i> Kelola Kasir
                     </a>
-                    
+
                     <a href="{{ route('admin.iphones.index') }}"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.iphones*') ? 'bg-brand-blue text-white font-medium shadow-md shadow-brand-blue/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fa-solid fa-mobile-screen w-5 text-center"></i> Data iPhone
                     </a>
                 @endif
 
-                <div class="pt-4 pb-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operasional</div>
+                <div class="pt-4 pb-1 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operasional
+                </div>
 
                 <a href="{{ route('admin.customers.index') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.customers*') ? 'bg-brand-blue text-white font-medium shadow-md shadow-brand-blue/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
@@ -90,7 +109,7 @@
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit"
-                        class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-50 text-red-500 hover:text-white py-2.5 rounded-xl transition font-medium text-sm">
+                        class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-50 dark:hover:bg-red-500/20 text-red-500 dark:text-red-400 hover:text-white py-2.5 rounded-xl transition font-medium text-sm">
                         <i class="fa-solid fa-right-from-bracket"></i> Keluar Sistem
                     </button>
                 </form>
@@ -99,25 +118,41 @@
 
         <div class="flex-1 flex flex-col overflow-hidden">
 
-            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
+            <header
+                class="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 flex items-center justify-between px-6 z-10 transition-colors duration-300">
                 <div class="flex items-center gap-3">
-                    <h2 class="text-sm font-medium text-gray-500">Selamat bekerja, <span class="text-brand-dark font-semibold">{{ Auth::user()->name }}</span>!</h2>
+                    <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">Selamat bekerja, <span
+                            class="text-brand-dark dark:text-white font-semibold">{{ Auth::user()->name }}</span>!</h2>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-gray-700">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-400 capitalize">{{ Auth::user()->role }}</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-brand-blue/10 text-brand-blue flex items-center justify-center font-bold">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                <div class="flex items-center gap-4">
+                    <button id="theme-toggle"
+                        class="w-10 h-10 flex items-center justify-center rounded-[0.8rem] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 focus:outline-none transition hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <i id="theme-toggle-light-icon"
+                            class="hidden fa-solid fa-sun text-brand-amber text-[1.1rem]"></i>
+                        <i id="theme-toggle-dark-icon"
+                            class="hidden fa-solid fa-moon text-indigo-500 text-[1.1rem]"></i>
+                    </button>
+
+                    <div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-4">
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ Auth::user()->name }}
+                            </p>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 capitalize">{{ Auth::user()->role }}</p>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-full bg-brand-blue/10 dark:bg-brand-blue/20 text-brand-blue dark:text-blue-400 flex items-center justify-center font-bold">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-brand-light p-6">
+            <main
+                class="flex-1 overflow-x-hidden overflow-y-auto bg-brand-light dark:bg-slate-950 p-6 transition-colors duration-300">
                 @yield('content')
             </main>
+
         </div>
     </div>
 
@@ -133,6 +168,8 @@
     @stack('scripts')
 
     @include('components.toast')
+    @include('components.darkmode')
+
 </body>
 
 </html>

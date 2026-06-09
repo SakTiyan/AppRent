@@ -6,22 +6,22 @@
 <div class="max-w-2xl mx-auto space-y-6" data-aos="fade-up">
     
     <div class="flex items-center gap-3">
-        <a href="{{ route('admin.bookings.index') }}" class="p-2 bg-white hover:bg-gray-100 rounded-xl border border-gray-200 transition text-gray-500" title="Kembali">
+        <a href="{{ route('admin.bookings.index') }}" class="p-2 bg-white dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-800 transition text-gray-500 dark:text-slate-400" title="Kembali">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Tambah Transaksi Sewa</h1>
-            <p class="text-sm text-gray-500 mt-1">Daftarkan transaksi penyewaan unit iPhone baru.</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Tambah Transaksi Sewa</h1>
+            <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">Daftarkan transaksi penyewaan unit iPhone baru.</p>
         </div>
     </div>
 
-    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 transition-colors duration-300">
         <form action="{{ route('admin.bookings.store') }}" method="POST">
             @csrf
             
             <div class="mb-5">
-                <label for="customer_id" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Pelanggan / Customer</label>
-                <select name="customer_id" id="customer_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 focus:bg-white font-medium text-gray-700" required>
+                <label for="customer_id" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Pilih Pelanggan / Customer</label>
+                <select name="customer_id" id="customer_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 font-medium text-gray-700 dark:text-slate-300" required>
                     <option value="">-- Pilih Customer --</option>
                     @foreach($customers as $customer)
                         <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
@@ -33,8 +33,8 @@
             </div>
 
             <div class="mb-5">
-                <label for="iphone_id" class="block text-sm font-semibold text-gray-700 mb-2">Pilih Unit iPhone (Hanya yang Tersedia)</label>
-                <select name="iphone_id" id="iphone_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 focus:bg-white font-medium text-gray-700" required>
+                <label for="iphone_id" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Pilih Unit iPhone (Hanya yang Tersedia)</label>
+                <select name="iphone_id" id="iphone_id" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 font-medium text-gray-700 dark:text-slate-300" required>
                     <option value="">-- Pilih Unit iPhone --</option>
                     @foreach($iphones as $iphone)
                         <option value="{{ $iphone->id }}" data-harga="{{ $iphone->harga_perhari }}" {{ old('iphone_id') == $iphone->id ? 'selected' : '' }}>
@@ -47,31 +47,31 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
-                    <label for="tanggal_sewa" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Mulai Sewa</label>
-                    <input type="date" name="tanggal_sewa" id="tanggal_sewa" class="w-full px-4 py-3 rounded-xl border @error('tanggal_sewa') border-red-400 @else border-gray-200 @enderror focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 focus:bg-white font-medium text-gray-700" value="{{ old('tanggal_sewa', date('Y-m-d')) }}" required>
+                    <label for="tanggal_sewa" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Tanggal Mulai Sewa</label>
+                    <input type="date" name="tanggal_sewa" id="tanggal_sewa" class="w-full px-4 py-3 rounded-xl border @error('tanggal_sewa') border-red-400 dark:border-red-500 @else border-gray-200 dark:border-slate-700 @enderror focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 font-medium text-gray-700 dark:text-slate-300" value="{{ old('tanggal_sewa', date('Y-m-d')) }}" required>
                     @error('tanggal_sewa') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label for="tanggal_kembali" class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Selesai Sewa</label>
-                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" class="w-full px-4 py-3 rounded-xl border @error('tanggal_kembali') border-red-400 @else border-gray-200 @enderror focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 focus:bg-white font-medium text-gray-700" value="{{ old('tanggal_kembali') }}" required>
+                    <label for="tanggal_kembali" class="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">Tanggal Selesai Sewa</label>
+                    <input type="date" name="tanggal_kembali" id="tanggal_kembali" class="w-full px-4 py-3 rounded-xl border @error('tanggal_kembali') border-red-400 dark:border-red-500 @else border-gray-200 dark:border-slate-700 @enderror focus:ring-2 focus:ring-brand-blue focus:border-brand-blue transition-all outline-none bg-gray-50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 font-medium text-gray-700 dark:text-slate-300" value="{{ old('tanggal_kembali') }}" required>
                     @error('tanggal_kembali') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Durasi Sewa</p>
-                    <div class="text-xl font-bold text-slate-700"><span id="display_durasi">0</span> Hari</div>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Durasi Sewa</p>
+                    <div class="text-xl font-bold text-slate-700 dark:text-slate-300"><span id="display_durasi">0</span> Hari</div>
                 </div>
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Estimasi Total Bayar</p>
-                    <div class="text-xl font-extrabold text-brand-blue">Rp <span id="display_total">0</span></div>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Estimasi Total Bayar</p>
+                    <div class="text-xl font-extrabold text-brand-blue dark:text-blue-400">Rp <span id="display_total">0</span></div>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
-                <a href="{{ route('admin.bookings.index') }}" class="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-sm font-bold transition">Batal</a>
+            <div class="flex items-center justify-end gap-3 border-t border-gray-100 dark:border-slate-800 pt-6">
+                <a href="{{ route('admin.bookings.index') }}" class="px-5 py-3 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-300 rounded-xl text-sm font-bold transition">Batal</a>
                 <button type="submit" class="px-6 py-3 bg-brand-blue hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-brand-blue/30 transition">Simpan Transaksi</button>
             </div>
         </form>

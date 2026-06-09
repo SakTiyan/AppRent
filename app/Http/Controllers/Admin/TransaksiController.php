@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // Namespace diperbarui ke folder Admin
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller; // Wajib import Controller utama
+use App\Http\Controllers\Controller;
 use App\Models\Transaksi;
 use App\Models\Booking;
 use Illuminate\Http\Request;
@@ -20,10 +20,26 @@ class TransaksiController extends Controller
     // 2. Form tambah pembayaran
     public function create()
     {
-        // Ambil booking yang belum dibayar
-        $bookings = Booking::with(['customer', 'iphone'])
-            ->whereNotIn('id', Transaksi::pluck('booking_id'))
-            ->get();
+        // Ambil semua booking yang statusnya masih Aktif
+        $allBookings = Booking::with(['customer', 'iphone'])->where('status_booking', 'Aktif')->get();
+
+        $bookings = [];
+        foreach ($allBookings as $b) {
+            // Hitung total biaya asli dari lama sewa
+            $totalOriginal = $b->total_hari * $b->iphone->harga_perhari;
+
+            // Hitung akumulasi nominal yang sudah pernah dibayar sebelumnya
+            $sudahDibayar = Transaksi::where('booking_id', $b->id)->sum('jumlah_bayar');
+
+            // Hitung sisa tagihan riil saat ini
+            $sisaTagihan = $totalOriginal - $sudahDibayar;
+
+            // Jika masih ada sisa tagihan, masukkan ke dalam antrean dropdown
+            if ($sisaTagihan > 0) {
+                $b->sisa_tagihan = $sisaTagihan; // Menambahkan properti dinamis baru ke objek booking
+                $bookings[] = $b;
+            }
+        }
 
         return view('admin.transaksis.create', compact('bookings'));
     }
@@ -39,22 +55,34 @@ class TransaksiController extends Controller
 
         $booking = Booking::with('iphone')->findOrFail($request->booking_id);
 
-        // HITUNG MANDIRI: total_hari dikali harga sewa iPhone
-        $tagihanAsli = $booking->total_hari * $booking->iphone->harga_perhari;
+        // Hitung total tagihan original dari awal peminjaman
+        $tagihanOriginal = $booking->total_hari * $booking->iphone->harga_perhari;
 
-        // Logika Status Pembayaran
-        $status = ($request->jumlah_bayar >= $tagihanAsli) ? 'Lunas' : 'Belum Lunas';
+        // Cek total pembayaran lama di database
+        $sudahDibayarSebelumnya = Transaksi::where('booking_id', $request->booking_id)->sum('jumlah_bayar');
 
+        // Gabungkan pembayaran lama dengan input bayar yang baru
+        $totalAkumulasi = $sudahDibayarSebelumnya + $request->jumlah_bayar;
+
+        // Logika penentuan status berdasarkan akumulasi dana masuk
+        if ($totalAkumulasi <= 0) {
+            $status = 'pending';
+        } elseif ($totalAkumulasi < $tagihanOriginal) {
+            $status = 'Belum Lunas';
+        } else {
+            $status = 'Lunas';
+        }
+
+        // Simpan data pembayaran saat ini ke database
         Transaksi::create([
             'booking_id' => $request->booking_id,
             'user_id' => Auth::id(),
             'tgl_bayar' => $request->tgl_bayar,
-            'total_biaya' => $tagihanAsli,
-            'jumlah_bayar' => $request->jumlah_bayar,
+            'total_biaya' => $tagihanOriginal, // Tetap grand total awal untuk arsip nota
+            'jumlah_bayar' => $request->jumlah_bayar, // Nominal uang tunai yang masuk saat ini
             'status_pembayaran' => $status,
         ]);
 
-        // FIX: Ditambahkan prefix admin.
         return redirect()->route('admin.transaksis.index')->with('success', 'Pembayaran berhasil diproses!');
     }
 
@@ -69,8 +97,6 @@ class TransaksiController extends Controller
     public function destroy($id)
     {
         Transaksi::findOrFail($id)->delete();
-
-        // FIX: Ditambahkan prefix admin.
         return redirect()->route('admin.transaksis.index')->with('error', 'Riwayat pembayaran berhasil dihapus!');
     }
 }

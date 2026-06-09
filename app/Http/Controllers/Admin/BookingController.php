@@ -133,4 +133,82 @@ class BookingController extends Controller
         $booking = Booking::with(['customer', 'iphone'])->findOrFail($id);
         return view('admin.bookings.show', compact('booking'));
     }
+
+    // 8. Menampilkan Halaman Booking (Untuk Customer di Web Depan)
+    public function customerCreate($id)
+    {
+        // Mengambil data iPhone yang dipilih
+        $iphone = Iphone::where('status', 'Tersedia')->findOrFail($id);
+
+        // MENGGUNAKAN FACADE AUTH UNTUK MENGAMBIL USER AKTIF
+        /** @var \App\Models\User $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        // Cari data profil Customer jika sudah ada berdasarkan nama user
+        $customer = null;
+        if ($user) {
+            $customer = Customer::where('nama_lengkap', $user->name)->first();
+        }
+
+        return view('customer.booking', compact('iphone', 'customer'));
+    }
+
+    // 9. Proses Simpan Transaksi dari Sisi Customer (Web Depan)
+    public function customerStore(Request $request, $id)
+    {
+        // 1. Validasi input dari form customer
+        $request->validate([
+            'nik' => 'required|string|min:16|max:16',
+            'no_hp' => 'required|string|max:15',
+            'alamat' => 'required|string',
+            'tanggal_sewa' => 'required|date',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_sewa',
+        ]);
+
+        // 2. Ambil data iPhone dan User Aktif
+        $iphone = Iphone::where('status', 'Tersedia')->findOrFail($id);
+
+        /** @var \App\Models\User $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        // 3. Update Profil Customer (karena NIK, HP, Alamat tadinya dummy saat register)
+        $customer = Customer::where('nama_lengkap', $user->name)->first();
+        if ($customer) {
+            $customer->update([
+                'nik' => $request->nik,
+                'no_hp' => $request->no_hp,
+                'alamat' => $request->alamat,
+            ]);
+        } else {
+            // Jaga-jaga jika customer tidak sengaja terhapus, buatkan ulang
+            $customer = Customer::create([
+                'nama_lengkap' => $user->name,
+                'nik' => $request->nik,
+                'no_hp' => $request->no_hp,
+                'alamat' => $request->alamat,
+            ]);
+        }
+
+        // 4. Hitung Durasi Waktu Hari
+        $tglSewa = new \DateTime($request->tanggal_sewa);
+        $tglKembali = new \DateTime($request->tanggal_kembali);
+        $lamaSewa = $tglSewa->diff($tglKembali)->days;
+        if ($lamaSewa <= 0) $lamaSewa = 1; // Minimal sewa 1 hari
+
+        // 5. Simpan ke database Booking
+        Booking::create([
+            'customer_id' => $customer->id,
+            'iphone_id' => $iphone->id,
+            'tgl_sewa' => $request->tanggal_sewa,
+            'tgl_kembali' => $request->tanggal_kembali,
+            'total_hari' => $lamaSewa,
+            'status_booking' => 'Aktif',
+        ]);
+
+        // 6. Ubah status iPhone agar tidak bisa disewa orang lain
+        $iphone->update(['status' => 'Disewa']);
+
+        // 7. Lempar kembali ke Dashboard Customer dengan notifikasi sukses
+        return redirect()->route('customer.dashboard')->with('success', 'Booking berhasil diajukan! Silakan datang ke toko untuk verifikasi KTP dan pengambilan unit.');
+    }
 }
